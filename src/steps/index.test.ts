@@ -8,7 +8,7 @@ import { fetchTokens, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
 import { fetchServices } from './services';
 
-const DEFAULT_CUSTOMER_ID = 'abc';
+const DEFAULT_CUSTOMER_ID = '6Bfjl1cR8HV2hPuQykFxJa';
 const DEFAULT_API_TOKEN = 'xyz';
 
 const integrationConfig: IntegrationConfig = {
