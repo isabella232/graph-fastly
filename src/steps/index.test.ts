@@ -1,9 +1,4 @@
-import {
-  createMockStepExecutionContext,
-  setupRecording,
-  Recording,
-} from '@jupiterone/integration-sdk-testing';
-
+import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-testing';
 import { IntegrationConfig } from '../types';
 import { fetchTokens, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
