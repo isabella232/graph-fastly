@@ -8,6 +8,7 @@ import {
   convertProperties,
   createMappedRelationship,
   RelationshipDirection,
+  Entity,
 } from '@jupiterone/integration-sdk-core';
 
 import { createAPIClient } from '../provider/client';
@@ -17,9 +18,13 @@ export async function fetchServices({
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
+  const accountEntity = (await jobState.getData(
+    `fastly-account:${instance.config.customerId}`,
+  )) as Entity;
+
   const apiClient = createAPIClient(instance.config);
 
-  await apiClient.getServices(async (data) => {
+  await apiClient.iterateServices(async (data) => {
     const serviceEntity = createIntegrationEntity({
       entityData: {
         source: data,
@@ -44,10 +49,8 @@ export async function fetchServices({
       jobState.addRelationship(
         createDirectRelationship({
           _class: RelationshipClass.HAS,
-          fromKey: `fastly-account:${instance.config.customerId}`,
-          fromType: 'fastly_account',
-          toKey: `fastly-service:${data.id}`,
-          toType: 'fastly_service',
+          from: accountEntity,
+          to: serviceEntity,
         }),
       ),
     ]);

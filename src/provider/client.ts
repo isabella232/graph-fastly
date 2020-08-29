@@ -68,7 +68,9 @@ export class APIClient {
     return this.getData<FastlyAccount>(`/customer/${this._config.customerId}`);
   }
 
-  public async getUsers(iteratee: ResourceIteratee<FastlyUser>): Promise<void> {
+  public async iterateUsers(
+    iteratee: ResourceIteratee<FastlyUser>,
+  ): Promise<void> {
     const items = await this.getData<FastlyUser[]>(
       `/customer/${this._config.customerId}/users`,
     );
@@ -77,7 +79,7 @@ export class APIClient {
     }
   }
 
-  public async getTokens(
+  public async iterateTokens(
     iteratee: ResourceIteratee<FastlyToken>,
   ): Promise<void> {
     const items = await this.getData<FastlyToken[]>(
@@ -88,7 +90,7 @@ export class APIClient {
     }
   }
 
-  public async getServices(
+  public async iterateServices(
     iteratee: ResourceIteratee<FastlyService>,
   ): Promise<void> {
     const items = await this.getData<FastlyService[]>(`/service`);

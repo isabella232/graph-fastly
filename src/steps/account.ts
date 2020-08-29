@@ -16,33 +16,36 @@ export async function fetchAccountDetails({
 
   const data = await apiClient.getAccountDetails();
 
-  await jobState.addEntity(
-    createIntegrationEntity({
-      entityData: {
-        source: data,
-        assign: {
-          _type: 'fastly_account',
-          _class: 'Account',
-          _key: `fastly-account:${data.id}`,
-          id: data.id,
-          displayName: data.name || data.id,
-          name: data.name,
-          address: data.postal_address,
-          phone: data.phone_number,
-          mfaEnabled: data.force_2fa,
-          mfaEnforced: data.force_2fa,
-          ssoEnforced: data.force_sso,
-          readOnly: data.readonly,
-          ownerId: data.owner_id,
-          ipWhitelist: data.ip_whitelist,
-          rateLimit: data.rate_limit,
-          createdOn: getTime(data.created_at),
-          updatedOn: getTime(data.updated_at),
-          deletedOn: getTime(data.deleted_at),
-        },
+  const accountEntity = createIntegrationEntity({
+    entityData: {
+      source: data,
+      assign: {
+        _type: 'fastly_account',
+        _class: 'Account',
+        _key: `fastly-account:${data.id}`,
+        id: data.id,
+        displayName: data.name || data.id,
+        name: data.name,
+        address: data.postal_address,
+        phone: data.phone_number,
+        mfaEnabled: data.force_2fa,
+        mfaEnforced: data.force_2fa,
+        ssoEnforced: data.force_sso,
+        readOnly: data.readonly,
+        ownerId: data.owner_id,
+        ipWhitelist: data.ip_whitelist,
+        rateLimit: data.rate_limit,
+        createdOn: getTime(data.created_at),
+        updatedOn: getTime(data.updated_at),
+        deletedOn: getTime(data.deleted_at),
       },
-    }),
-  );
+    },
+  });
+
+  await Promise.all([
+    jobState.addEntity(accountEntity),
+    jobState.setData(accountEntity._key, accountEntity),
+  ]);
 }
 
 export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
