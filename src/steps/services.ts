@@ -111,30 +111,28 @@ export async function fetchServices({
     const domains = await apiClient.getServiceDomains(data.id, data.version);
 
     for (const domain of domains) {
-      await Promise.all([
-        jobState.addRelationship(
-          createMappedRelationship({
-            _type: 'fastly_service_connects_domain_record',
-            _class: RelationshipClass.CONNECTS,
-            _mapping: {
-              sourceEntityKey: serviceEntity._key,
-              relationshipDirection: RelationshipDirection.FORWARD,
-              targetFilterKeys: [['_class', 'name']],
-              targetEntity: {
-                _class: 'DomainRecord',
-                name: domain.name,
-              },
+      await jobState.addRelationship(
+        createMappedRelationship({
+          _type: 'fastly_service_connects_domain_record',
+          _class: RelationshipClass.CONNECTS,
+          _mapping: {
+            sourceEntityKey: serviceEntity._key,
+            relationshipDirection: RelationshipDirection.FORWARD,
+            targetFilterKeys: [['_class', 'name']],
+            targetEntity: {
+              _class: 'DomainRecord',
+              name: domain.name,
             },
-            properties: {
-              description: domain.comment,
-              locked: domain.locked,
-              createdOn: getTime(domain.created_at),
-              updatedOn: getTime(domain.updated_at),
-              deletedOn: getTime(domain.deleted_at),
-            },
-          }),
-        ),
-      ]);
+          },
+          properties: {
+            description: domain.comment,
+            locked: domain.locked,
+            createdOn: getTime(domain.created_at),
+            updatedOn: getTime(domain.updated_at),
+            deletedOn: getTime(domain.deleted_at),
+          },
+        }),
+      );
     }
   });
 }
