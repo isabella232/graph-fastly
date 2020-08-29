@@ -45,14 +45,15 @@ The following entities are created:
 
 The following relationships are created/mapped:
 
-| Source Entity `_type` | Relationship `_class` | Target Entity `_type`    |
-| --------------------- | --------------------- | ------------------------ |
-| `fastly_account`      | **HAS**               | `fastly_user`            |
-| `fastly_account`      | **HAS**               | `fastly_api_token`       |
-| `fastly_user`         | **HAS**               | `fastly_api_token`       |
-| `fastly_account`      | **HAS**               | `fastly_service`         |
-| `fastly_service`      | **HAS**               | `fastly_service_backend` |
-| `fastly_service`      | **HAS**               | `DomainRecord`           |
+| Source Entity `_type`    | Relationship `_class` | Target Entity `_type`    |
+| ------------------------ | --------------------- | ------------------------ |
+| `fastly_account`         | **HAS**               | `fastly_user`            |
+| `fastly_account`         | **HAS**               | `fastly_api_token`       |
+| `fastly_user`            | **HAS**               | `fastly_api_token`       |
+| `fastly_account`         | **HAS**               | `fastly_service`         |
+| `fastly_service`         | **HAS**               | `fastly_service_backend` |
+| `fastly_service_backend` | **CONNECTS**          | `Host or Gateway`        |
+| `fastly_service`         | **CONNECTS**          | `DomainRecord`           |
 
 <!--
 ********************************************************************************

@@ -82,6 +82,26 @@ export async function fetchServices({
             to: backendEntity,
           }),
         ),
+        jobState.addRelationship(
+          createMappedRelationship({
+            _type: 'fastly_service_backend_connects_host',
+            _class: RelationshipClass.CONNECTS,
+            _mapping: {
+              sourceEntityKey: backendEntity._key,
+              relationshipDirection: RelationshipDirection.FORWARD,
+              targetFilterKeys: [
+                ['_class', 'ipAddress'],
+                ['_class', 'hostname'],
+              ],
+              targetEntity: {
+                _class: ['Host', 'Gateway'],
+                ipAddress: backend.address,
+                hostname: backend.hostname,
+              },
+              skipTargetCreation: true,
+            },
+          }),
+        ),
       ]);
     }
 
@@ -146,8 +166,14 @@ export const serviceSteps: IntegrationStep<IntegrationConfig>[] = [
         targetType: 'fastly_service_backend',
       },
       {
+        _type: 'fastly_service_backend_connects_host',
+        _class: RelationshipClass.CONNECTS,
+        sourceType: 'fastly_service_backend',
+        targetType: 'Host or Gateway',
+      },
+      {
         _type: 'fastly_service_connects_domain_record',
-        _class: RelationshipClass.HAS,
+        _class: RelationshipClass.CONNECTS,
         sourceType: 'fastly_service',
         targetType: 'DomainRecord',
       },
