@@ -1,4 +1,8 @@
-import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-testing';
+import {
+  createMockStepExecutionContext,
+  Recording,
+  setupRecording,
+} from '@jupiterone/integration-sdk-testing';
 import { IntegrationConfig } from '../types';
 import { fetchTokens, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
@@ -13,6 +17,17 @@ const integrationConfig: IntegrationConfig = {
 };
 
 jest.setTimeout(10000 * 2);
+
+let recording: Recording;
+beforeEach(() => {
+  recording = setupRecording({
+    directory: __dirname,
+    name: 'fastly_recordings',
+  });
+});
+afterEach(async () => {
+  await recording.stop();
+});
 
 test('should collect data', async () => {
   const context = createMockStepExecutionContext<IntegrationConfig>({
