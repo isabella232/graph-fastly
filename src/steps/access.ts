@@ -31,6 +31,7 @@ export async function fetchUsers({
             username: data.login,
             login: data.login,
             role: data.role,
+            admin: data.role === 'superuser',
             mfaEnabled: data.two_factor_auth_enabled,
             mfaSetupRequired: data.two_factor_setup_required,
             locked: data.locked,
