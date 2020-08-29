@@ -11,7 +11,7 @@ conigure this integration you should have an account in Fastly and create an
 - The **Customer ID** can be obtained from
   https://manage.fastly.com/account/company
 
-- The **API Token** can e be created from
+- The **API Token** can be created from
   https://manage.fastly.com/account/personal/tokens
 
 ## Data Model
