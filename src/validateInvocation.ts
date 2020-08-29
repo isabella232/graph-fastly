@@ -3,7 +3,7 @@ import {
   IntegrationValidationError,
 } from '@jupiterone/integration-sdk-core';
 
-import { createAPIClient } from './client';
+import { createAPIClient } from './provider/client';
 import { IntegrationConfig } from './types';
 
 export default async function validateInvocation(
@@ -11,9 +11,9 @@ export default async function validateInvocation(
 ) {
   const { config } = context.instance;
 
-  if (!config.clientId || !config.clientSecret) {
+  if (!config.customerId || !config.apiToken) {
     throw new IntegrationValidationError(
-      'Config requires all of {clientId, clientSecret}',
+      'Config requires all of {customerId, apiToken}',
     );
   }
 
