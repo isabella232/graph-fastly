@@ -23,6 +23,7 @@ beforeEach(() => {
   recording = setupRecording({
     directory: __dirname,
     name: 'fastly_recordings',
+    redactedRequestHeaders: ['fastly-key'],
   });
 });
 afterEach(async () => {
