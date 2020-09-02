@@ -1,37 +1,48 @@
 import {
   createDirectRelationship,
   createIntegrationEntity,
-  Entity,
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
-  IntegrationMissingKeyError,
+  getTime,
+  Entity,
 } from '@jupiterone/integration-sdk-core';
 
-import { createAPIClient } from '../client';
+import { createAPIClient } from '../provider/client';
 import { IntegrationConfig } from '../types';
-import { ACCOUNT_ENTITY_KEY } from './account';
 
 export async function fetchUsers({
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
+  const accountEntity = (await jobState.getData(
+    `fastly-account:${instance.config.customerId}`,
+  )) as Entity;
+
   const apiClient = createAPIClient(instance.config);
 
-  const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
-
-  await apiClient.iterateUsers(async (user) => {
+  await apiClient.iterateUsers(async (data) => {
     const userEntity = createIntegrationEntity({
       entityData: {
-        source: user,
+        source: data,
         assign: {
-          _type: 'acme_user',
+          _type: 'fastly_user',
           _class: 'User',
-          username: 'testusername',
-          email: 'test@test.com',
-          // This is a custom property that is not a part of the data model class
-          // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/User.json
-          firstName: 'John',
+          _key: `fastly-user:${data.id}`,
+          id: data.id,
+          displayName: data.name || data.id,
+          name: data.name,
+          username: data.login,
+          login: data.login,
+          role: data.role,
+          admin: data.role === 'superuser',
+          mfaEnabled: data.two_factor_auth_enabled,
+          mfaSetupRequired: data.two_factor_setup_required,
+          locked: data.locked,
+          active: !(data.deleted_at || data.locked),
+          createdOn: getTime(data.created_at),
+          updatedOn: getTime(data.updated_at),
+          deletedOn: getTime(data.deleted_at),
         },
       },
     });
@@ -49,57 +60,61 @@ export async function fetchUsers({
   });
 }
 
-export async function fetchGroups({
+export async function fetchTokens({
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const apiClient = createAPIClient(instance.config);
 
-  const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
-
-  await apiClient.iterateGroups(async (group) => {
-    const groupEntity = createIntegrationEntity({
+  await apiClient.iterateTokens(async (data) => {
+    const tokenEntity = createIntegrationEntity({
       entityData: {
-        source: group,
+        source: data,
         assign: {
-          _type: 'acme_group',
-          _class: 'UserGroup',
-          email: 'testgroup@test.com',
-          // This is a custom property that is not a part of the data model class
-          // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/UserGroup.json
-          logoLink: 'https://test.com/logo.png',
+          _type: 'fastly_api_token',
+          _class: 'AccessKey',
+          _key: `fastly-api-token:${data.id}`,
+          id: data.id,
+          displayName: data.name || data.id,
+          name: data.name,
+          ip: data.ip,
+          userAgent: data.user_agent,
+          scope: data.scope,
+          scopes: data.scopes,
+          services: data.services,
+          userId: data.user_id,
+          createdOn: getTime(data.created_at),
+          expiresOn: getTime(data.expires_at),
+          sudoExpiresOn: getTime(data.sudo_expires_at),
+          lastUsedOn: getTime(data.last_used_at),
+          lastUsedAt: data.ip,
+          lastUsedBy: data.user_agent,
         },
       },
     });
 
+    const fromEntity = data.user_id
+      ? {
+          _key: `fastly-user:${data.user_id}`,
+          _type: 'fastly_user',
+          _class: 'User',
+        }
+      : {
+          _key: `fastly-account:${instance.config.customerId}`,
+          _type: 'fastly-account',
+          _class: 'Account',
+        };
+
     await Promise.all([
-      jobState.addEntity(groupEntity),
+      jobState.addEntity(tokenEntity),
       jobState.addRelationship(
         createDirectRelationship({
           _class: RelationshipClass.HAS,
-          from: accountEntity,
-          to: groupEntity,
+          from: fromEntity,
+          to: tokenEntity,
         }),
       ),
     ]);
-
-    for (const user of group.users || []) {
-      const userEntity = await jobState.findEntity(user.id);
-
-      if (!userEntity) {
-        throw new IntegrationMissingKeyError(
-          `Expected user with key to exist (key=${user.id})`,
-        );
-      }
-
-      await jobState.addRelationship(
-        createDirectRelationship({
-          _class: RelationshipClass.HAS,
-          from: groupEntity,
-          to: userEntity,
-        }),
-      );
-    }
   });
 }
 
@@ -109,32 +124,47 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch Users',
     entities: [
       {
-        resourceName: 'Account',
-        _type: 'acme_account',
-        _class: 'Account',
+        resourceName: 'User',
+        _type: 'fastly_user',
+        _class: 'User',
       },
     ],
     relationships: [
       {
-        _type: 'acme_account_has_user',
+        _type: 'fastly_account_has_user',
         _class: RelationshipClass.HAS,
-        sourceType: 'acme_account',
-        targetType: 'acme_user',
-      },
-      {
-        _type: 'acme_account_has_group',
-        _class: RelationshipClass.HAS,
-        sourceType: 'acme_account',
-        targetType: 'acme_group',
-      },
-      {
-        _type: 'acme_group_has_user',
-        _class: RelationshipClass.HAS,
-        sourceType: 'acme_group',
-        targetType: 'acme_user',
+        sourceType: 'fastly_account',
+        targetType: 'fastly_user',
       },
     ],
     dependsOn: ['fetch-account'],
     executionHandler: fetchUsers,
+  },
+  {
+    id: 'fetch-tokens',
+    name: 'Fetch API Tokens',
+    entities: [
+      {
+        resourceName: 'API Token',
+        _type: 'fastly_api_token',
+        _class: 'AccessKey',
+      },
+    ],
+    relationships: [
+      {
+        _type: 'fastly_account_has_api_token',
+        _class: RelationshipClass.HAS,
+        sourceType: 'fastly_account',
+        targetType: 'fastly_api_token',
+      },
+      {
+        _type: 'fastly_user_has_api_token',
+        _class: RelationshipClass.HAS,
+        sourceType: 'fastly_user',
+        targetType: 'fastly_api_token',
+      },
+    ],
+    dependsOn: ['fetch-account'],
+    executionHandler: fetchTokens,
   },
 ];

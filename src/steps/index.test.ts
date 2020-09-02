@@ -1,27 +1,44 @@
-import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-testing';
-
+import {
+  createMockStepExecutionContext,
+  Recording,
+  setupRecording,
+} from '@jupiterone/integration-sdk-testing';
 import { IntegrationConfig } from '../types';
-import { fetchGroups, fetchUsers } from './access';
+import { fetchTokens, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
+import { fetchServices } from './services';
 
-const DEFAULT_CLIENT_ID = 'dummy-acme-client-id';
-const DEFAULT_CLIENT_SECRET = 'dummy-acme-client-secret';
+const DEFAULT_CUSTOMER_ID = '6Bfjl1cR8HV2hPuQykFxJa';
+const DEFAULT_API_TOKEN = 'xyz';
 
 const integrationConfig: IntegrationConfig = {
-  clientId: process.env.CLIENT_ID || DEFAULT_CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET || DEFAULT_CLIENT_SECRET,
+  customerId: process.env.CUSTOMER_ID || DEFAULT_CUSTOMER_ID,
+  apiToken: process.env.API_TOKEN || DEFAULT_API_TOKEN,
 };
+
+jest.setTimeout(10000 * 2);
+
+let recording: Recording;
+beforeEach(() => {
+  recording = setupRecording({
+    directory: __dirname,
+    name: 'fastly_recordings',
+    redactedRequestHeaders: ['fastly-key'],
+  });
+});
+afterEach(async () => {
+  await recording.stop();
+});
 
 test('should collect data', async () => {
   const context = createMockStepExecutionContext<IntegrationConfig>({
     instanceConfig: integrationConfig,
   });
 
-  // Simulates dependency graph execution.
-  // See https://github.com/JupiterOne/sdk/issues/262.
   await fetchAccountDetails(context);
   await fetchUsers(context);
-  await fetchGroups(context);
+  await fetchTokens(context);
+  await fetchServices(context);
 
   // Review snapshot, failure is a regression
   expect({
@@ -39,16 +56,16 @@ test('should collect data', async () => {
   ).toMatchGraphObjectSchema({
     _class: ['Account'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_account' },
-        manager: { type: 'string' },
+        _type: { const: 'fastly_account' },
+        name: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['manager'],
+      required: ['name'],
     },
   });
 
@@ -57,40 +74,57 @@ test('should collect data', async () => {
   ).toMatchGraphObjectSchema({
     _class: ['User'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_user' },
-        firstName: { type: 'string' },
+        _type: { const: 'fastly_user' },
+        name: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['firstName'],
+      required: ['name'],
     },
   });
 
   expect(
     context.jobState.collectedEntities.filter((e) =>
-      e._class.includes('UserGroup'),
+      e._class.includes('AccessKey'),
     ),
   ).toMatchGraphObjectSchema({
-    _class: ['UserGroup'],
+    _class: ['AccessKey'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_group' },
-        logoLink: {
-          type: 'string',
-          // Validate that the `logoLink` property has a URL format
-          format: 'url',
-        },
+        _type: { const: 'fastly_api_token' },
+        userId: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['logoLink'],
+      required: ['userId'],
+    },
+  });
+
+  expect(
+    context.jobState.collectedEntities.filter((e) =>
+      e._class.includes('Service'),
+    ),
+  ).toMatchGraphObjectSchema({
+    _class: ['Service'],
+    schema: {
+      additionalProperties: true,
+      properties: {
+        _type: { const: 'fastly_service' },
+        name: { type: 'string' },
+        version: { type: 'number' },
+        _rawData: {
+          type: 'array',
+          items: { type: 'object' },
+        },
+      },
+      required: ['name', 'version'],
     },
   });
 });

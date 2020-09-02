@@ -1,10 +1,10 @@
 import { IntegrationInstanceConfigFieldMap } from '@jupiterone/integration-sdk-core';
 
 const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
-  clientId: {
+  customerId: {
     type: 'string',
   },
-  clientSecret: {
+  apiToken: {
     type: 'string',
     mask: true,
   },

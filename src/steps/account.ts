@@ -2,36 +2,49 @@ import {
   createIntegrationEntity,
   IntegrationStep,
   IntegrationStepExecutionContext,
+  getTime,
 } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from '../types';
-
-export const ACCOUNT_ENTITY_KEY = 'entity:account';
+import { createAPIClient } from '../provider/client';
 
 export async function fetchAccountDetails({
+  instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
+  const apiClient = createAPIClient(instance.config);
+
+  const data = await apiClient.getAccountDetails();
+
   const accountEntity = createIntegrationEntity({
     entityData: {
-      source: {
-        id: 'acme-unique-account-id',
-        name: 'Example Co. Acme Account',
-      },
+      source: data,
       assign: {
-        _key: 'acme-unique-account-id',
-        _type: 'acme_account',
+        _type: 'fastly_account',
         _class: 'Account',
-        mfaEnabled: true,
-        // This is a custom property that is not a part of the data model class
-        // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/Account.json
-        manager: 'Manager Name',
+        _key: `fastly-account:${data.id}`,
+        id: data.id,
+        displayName: data.name || data.id,
+        name: data.name,
+        address: data.postal_address,
+        phone: data.phone_number,
+        mfaEnabled: data.force_2fa,
+        mfaEnforced: data.force_2fa,
+        ssoEnforced: data.force_sso,
+        readOnly: data.readonly,
+        ownerId: data.owner_id,
+        ipWhitelist: data.ip_whitelist,
+        rateLimit: data.rate_limit,
+        createdOn: getTime(data.created_at),
+        updatedOn: getTime(data.updated_at),
+        deletedOn: getTime(data.deleted_at),
       },
     },
   });
 
   await Promise.all([
     jobState.addEntity(accountEntity),
-    jobState.setData(ACCOUNT_ENTITY_KEY, accountEntity),
+    jobState.setData(accountEntity._key, accountEntity),
   ]);
 }
 
@@ -42,7 +55,7 @@ export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
     entities: [
       {
         resourceName: 'Account',
-        _type: 'acme_account',
+        _type: 'fastly_account',
         _class: 'Account',
       },
     ],

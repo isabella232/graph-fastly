@@ -6,12 +6,12 @@ import { IntegrationInstanceConfig } from '@jupiterone/integration-sdk-core';
  */
 export interface IntegrationConfig extends IntegrationInstanceConfig {
   /**
-   * The provider API client ID used to authenticate requests.
+   * The Customer ID obtained from https://manage.fastly.com/account/company
    */
-  clientId: string;
+  customerId: string;
 
   /**
-   * The provider API client secret used to authenticate requests.
+   * The API Token created from https://manage.fastly.com/account/personal/tokens
    */
-  clientSecret: string;
+  apiToken: string;
 }

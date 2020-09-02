@@ -2,21 +2,19 @@
 
 ## Setup
 
-In this section, please provide details about how to set up the integration with
-JupiterOne. This may require provisioning some resources on the provider's side
-(perhaps a role, app, or api key) and passing information over to JupiterOne.
+JupiterOne provides a managed integration for Fastly. The integration connects
+directly to Fastly APIs to obtain account, access, and services related data. To
+conigure this integration you should have an account in Fastly and create an
+**API Token** with Read-only access (`global:read`). You will also need the
+**Customer ID** from the settings page of your Fastly account.
+
+- The **Customer ID** can be obtained from
+  https://manage.fastly.com/account/company
+
+- The **API Token** can be created from
+  https://manage.fastly.com/account/personal/tokens
 
 ## Data Model
-
-Provide an overview here of the resources collected from the integration. Please
-provide a mapping of how the resources collected map to the JupiterOne Data
-Model. The tables below were taken from the Azure integration to provide an
-example of how to display that information.
-
-When you start developing an integration, please clear out the tables below. As
-you add support for new entities and relationships, please update the tables and
-document the addition in the [CHANGELOG.md](../CHANGELOG.md) file at the root of
-the project.
 
 <!-- {J1_DOCUMENTATION_MARKER_START} -->
 <!--
@@ -35,19 +33,27 @@ https://github.com/JupiterOne/sdk/blob/master/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources | Entity `_type` | Entity `_class` |
-| --------- | -------------- | --------------- |
-| Account   | `acme_account` | `Account`       |
+| Resources       | Entity `_type`           | Entity `_class`       |
+| --------------- | ------------------------ | --------------------- |
+| Account         | `fastly_account`         | `Account`             |
+| User            | `fastly_user`            | `User`                |
+| API Token       | `fastly_api_token`       | `AccessKey`           |
+| Service         | `fastly_service`         | `Service`             |
+| Service Backend | `fastly_service_backend` | `ApplicationEndpoint` |
 
 ### Relationships
 
 The following relationships are created/mapped:
 
-| Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
-| --------------------- | --------------------- | --------------------- |
-| `acme_account`        | **HAS**               | `acme_user`           |
-| `acme_account`        | **HAS**               | `acme_group`          |
-| `acme_group`          | **HAS**               | `acme_user`           |
+| Source Entity `_type`    | Relationship `_class` | Target Entity `_type`    |
+| ------------------------ | --------------------- | ------------------------ |
+| `fastly_account`         | **HAS**               | `fastly_user`            |
+| `fastly_account`         | **HAS**               | `fastly_api_token`       |
+| `fastly_user`            | **HAS**               | `fastly_api_token`       |
+| `fastly_account`         | **HAS**               | `fastly_service`         |
+| `fastly_service`         | **HAS**               | `fastly_service_backend` |
+| `fastly_service_backend` | **CONNECTS**          | `Host or Gateway`        |
+| `fastly_service`         | **CONNECTS**          | `DomainRecord`           |
 
 <!--
 ********************************************************************************

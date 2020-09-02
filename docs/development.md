@@ -1,28 +1,21 @@
 # Development
 
-Add details here to give a brief overview of how to work with the provider APIs.
-Please reference any SDKs or API docs used to help build the integration here.
+Fastly provides detailed
+[API reference docs](https://developer.fastly.com/reference/api).
 
 ## Prerequisites
 
-Supply details about software or tooling (like maybe Docker or Terraform) that
-is needed for development here.
-
-Please supply references to documentation that details how to install those
-dependencies here.
-
-Tools like Node.js and NPM are already covered in the [README](../README.md) so
-don't bother documenting that here.
+No extra prerequisites required than covered in the [README](../README.md) file.
 
 ## Provider account setup
 
-Please provide information about the steps needed to create an account with a
-provider. Images and references to a provider's documentation is very helpful
-for new developers picking up your work.
+Sign up for a Fastly developer account here: <https://www.fastly.com/signup>
 
 ## Authentication
 
-Supply details here for information on how to authenticate with a provider so
-that developers have an idea of what's needed to hit APIs. It may be useful to
-provide explanations for each value specified in
-[../src/instanceConfigFields.json](../src/instanceConfigFields.json).
+Customer ID and an API Token is required to authenticate to the service.
+
+- The Customer ID can be obtained from https://manage.fastly.com/account/company
+
+- The API Token can e be created from
+  https://manage.fastly.com/account/personal/tokens

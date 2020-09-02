@@ -29,10 +29,10 @@ Given this example configuration:
 import { IntegrationInstanceConfigFieldMap } from '@jupiterone/integration-sdk-core';
 
 const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
-  clientId: {
+  csutomerId: {
     type: 'string',
   },
-  clientSecret: {
+  apiToken: {
     type: 'string',
     mask: true,
   },
@@ -44,20 +44,25 @@ export default instanceConfigFields;
 You would provide a `.env` file like this:
 
 ```bash
-CLIENT_ID="client-id"
-CLIENT_SECRET="supersecret"
+CUSTOMER_ID="customer-id"
+API_TOKEN="supersecret"
 ```
 
 The snake cased environment variables will automatically be converted and
-applied to the camel cased configuration field. So for example, `CLIENT_ID` will
-apply to the `clientId` config field, `CLIENT_SECRET` will apply to
-`clientSecret`, and `MY_SUPER_SECRET_CONFIGURATION_VALUE` will apply to a
-`mySuperSecretConfigurationValue` configuration field.
+applied to the camel cased configuration field. So for example, `CUSTOMER_ID`
+will apply to the `customerId` config field and `API_TOKEN` will apply to
+`apiToken`.
 
 ## Running the integration
 
 To start collecting data, run `yarn start` from the root of the project. This
 will load in your configuration from `src/index.ts`.
+
+To visualize the graph using locally collected data, run `yarn graph` from the
+root of the project. Open `/.j1-integration/graph/index.html` in a browser. The
+resulting graph should look like this:
+
+![fastly-graph](docs/graph.png)
 
 ## Documentation
 

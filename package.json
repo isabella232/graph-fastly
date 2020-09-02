@@ -1,7 +1,7 @@
 {
-  "name": "@jupiterone/integration-template",
-  "version": "1.0.0",
-  "description": "A JupiterOne Integration",
+  "name": "@jupiterone/graph-fastly",
+  "version": "0.1.0",
+  "description": "A graph conversion tool for https://www.fastly.com",
   "license": "MPL-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
