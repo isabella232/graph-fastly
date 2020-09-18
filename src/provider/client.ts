@@ -1,7 +1,4 @@
 import axios from 'axios';
-
-import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
-
 import { IntegrationConfig } from '../types';
 import {
   FastlyUser,
@@ -44,24 +41,12 @@ export class APIClient {
     }
   }
 
-  public async verifyAuthentication(): Promise<void> {
-    try {
-      const { id } = await this.getData('/current_customer');
-      if (id !== this._config.customerId) {
-        throw new IntegrationProviderAuthenticationError({
-          endpoint: '/current_customer',
-          status: 200,
-          statusText: 'Incorrect Customer Id',
-        });
-      }
-    } catch (err) {
-      throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: err.url,
-        status: err.status,
-        statusText: err.statusText,
-      });
-    }
+  public async getCurrentCustomer(): Promise<FastlyAccount> {
+    return await this.getData<FastlyAccount>('/current_customer');
+  }
+
+  public async getCurrentUser(): Promise<FastlyUser> {
+    return this.getData<FastlyUser>('/current_user');
   }
 
   public async getAccountDetails(): Promise<FastlyAccount> {

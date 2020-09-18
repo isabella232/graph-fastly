@@ -8,7 +8,7 @@ import {
 } from '@jupiterone/integration-sdk-testing';
 
 import { IntegrationConfig } from './types';
-import validateInvocation from './validateInvocation';
+import getStepStartStates from './getStepStartStates';
 
 it('requires valid config', async () => {
   const executionContext = createMockExecutionContext<IntegrationConfig>({
@@ -16,7 +16,7 @@ it('requires valid config', async () => {
   });
 
   try {
-    await validateInvocation(executionContext);
+    await getStepStartStates(executionContext);
   } catch (e) {
     expect(e instanceof IntegrationValidationError).toBe(true);
   }
@@ -40,7 +40,7 @@ it('auth error', async () => {
   });
 
   try {
-    await validateInvocation(executionContext);
+    await getStepStartStates(executionContext);
   } catch (e) {
     expect(e instanceof IntegrationProviderAuthenticationError).toBe(true);
   }

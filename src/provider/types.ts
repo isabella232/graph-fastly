@@ -33,6 +33,13 @@ export type FastlyAccount = {
   san_domains: number;
 };
 
+export enum FastlyUserRole {
+  USER = 'user',
+  BILLING = 'billing',
+  ENGINEER = 'engineer',
+  SUPERUSER = 'superuser',
+}
+
 export type FastlyUser = {
   id: string;
   name: string;
@@ -40,7 +47,7 @@ export type FastlyUser = {
   updated_at: string;
   customer_id: string;
   require_new_password: boolean;
-  role: string;
+  role: FastlyUserRole;
   login: string;
   deleted_at: string | null;
   locked: boolean;
