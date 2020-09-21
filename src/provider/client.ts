@@ -41,10 +41,6 @@ export class APIClient {
     }
   }
 
-  public async getCurrentCustomer(): Promise<FastlyAccount> {
-    return await this.getData<FastlyAccount>('/current_customer');
-  }
-
   public async getCurrentUser(): Promise<FastlyUser> {
     return this.getData<FastlyUser>('/current_user');
   }

@@ -33,6 +33,7 @@ export type FastlyAccount = {
   san_domains: number;
 };
 
+// https://docs.fastly.com/en/guides/configuring-user-roles-and-permissions#user-roles-and-what-they-can-do
 export enum FastlyUserRole {
   USER = 'user',
   BILLING = 'billing',
