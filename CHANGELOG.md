@@ -8,4 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
-First release.
+## 0.1.2
+
+### Fixed
+
+- Introduced step start state configuration based on incoming user role
+
+## 0.1.1
+
+### Added
+
+- First release.

@@ -33,6 +33,14 @@ export type FastlyAccount = {
   san_domains: number;
 };
 
+// https://docs.fastly.com/en/guides/configuring-user-roles-and-permissions#user-roles-and-what-they-can-do
+export enum FastlyUserRole {
+  USER = 'user',
+  BILLING = 'billing',
+  ENGINEER = 'engineer',
+  SUPERUSER = 'superuser',
+}
+
 export type FastlyUser = {
   id: string;
   name: string;
@@ -40,7 +48,7 @@ export type FastlyUser = {
   updated_at: string;
   customer_id: string;
   require_new_password: boolean;
-  role: string;
+  role: FastlyUserRole;
   login: string;
   deleted_at: string | null;
   locked: boolean;
