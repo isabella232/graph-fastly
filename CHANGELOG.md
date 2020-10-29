@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 0.2.0
+
+- Upgrade SDK v4
+
 ## 0.1.2
 
 ### Fixed
