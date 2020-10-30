@@ -35,11 +35,11 @@ The following entities are created:
 
 | Resources       | Entity `_type`           | Entity `_class`       |
 | --------------- | ------------------------ | --------------------- |
-| Account         | `fastly_account`         | `Account`             |
-| User            | `fastly_user`            | `User`                |
 | API Token       | `fastly_api_token`       | `AccessKey`           |
+| Account         | `fastly_account`         | `Account`             |
 | Service         | `fastly_service`         | `Service`             |
 | Service Backend | `fastly_service_backend` | `ApplicationEndpoint` |
+| User            | `fastly_user`            | `User`                |
 
 ### Relationships
 
@@ -47,13 +47,13 @@ The following relationships are created/mapped:
 
 | Source Entity `_type`    | Relationship `_class` | Target Entity `_type`    |
 | ------------------------ | --------------------- | ------------------------ |
-| `fastly_account`         | **HAS**               | `fastly_user`            |
 | `fastly_account`         | **HAS**               | `fastly_api_token`       |
-| `fastly_user`            | **HAS**               | `fastly_api_token`       |
 | `fastly_account`         | **HAS**               | `fastly_service`         |
-| `fastly_service`         | **HAS**               | `fastly_service_backend` |
+| `fastly_account`         | **HAS**               | `fastly_user`            |
 | `fastly_service_backend` | **CONNECTS**          | `Host or Gateway`        |
 | `fastly_service`         | **CONNECTS**          | `DomainRecord`           |
+| `fastly_service`         | **HAS**               | `fastly_service_backend` |
+| `fastly_user`            | **HAS**               | `fastly_api_token`       |
 
 <!--
 ********************************************************************************
