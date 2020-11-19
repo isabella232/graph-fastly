@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 0.2.1
+
+- Throw a better error when get data request fails
+
 ## 0.2.0
 
 - Upgrade SDK v4

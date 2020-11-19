@@ -1,3 +1,4 @@
+import { IntegrationProviderAPIError } from '@jupiterone/integration-sdk-core';
 import axios from 'axios';
 import { IntegrationConfig } from '../types';
 import {
@@ -33,8 +34,9 @@ export class APIClient {
       return data;
     } catch (err) {
       const response = err.response || {};
-      throw Object.assign(new Error(err.message), {
-        url: url,
+      throw new IntegrationProviderAPIError({
+        cause: err,
+        endpoint: url,
         status: response.status || err.status || 'UNKNOWN',
         statusText: response.statusText || err.statusText || 'UNKNOWN',
       });
