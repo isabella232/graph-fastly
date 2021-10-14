@@ -24,7 +24,7 @@ export class APIClient {
   private async getData<T>(path: string, args?: object): Promise<T> {
     const url = `https://${HOSTNAME}${path.startsWith('/') ? '' : '/'}${path}`;
     try {
-      const { data } = await axios.get(url, {
+      const { data } = await axios.get<T>(url, {
         headers: {
           Accept: 'application/json',
           'Fastly-Key': this._config.apiToken,

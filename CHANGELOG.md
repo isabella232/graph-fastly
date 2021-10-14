@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.0.0
+
+### Changed
+
+- Update all packages including JupiterOne SDK
+- Open source managed questions
+
 ## 0.2.1
 
 - Throw a better error when get data request fails

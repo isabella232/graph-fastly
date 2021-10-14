@@ -1,0 +1,39 @@
+---
+sourceId: managed:fastly
+integrationDefinitionId: "${integration_definition_id}"
+questions:
+- id: managed-question-network-fastly-backend-service-connect-host
+  title: Which Fastly backend services are connected to a host or gateway?
+  description: Returns a list of Fastly backend services that are connected to a host or to a gateway.
+  queries:
+  - query: |
+      FIND fastly_service_backend AS b
+      THAT CONNECTS (Host|Gateway) AS x
+      RETURN
+        b.displayName AS FastlyServiceBackend,
+        b.ipAddress AS FSB_IPAddress,
+        x.displayName,
+        x._type,
+        x.ipAddress
+  tags:
+  - fastly
+  - network
+
+- id: managed-question-network-fastly-user-api-tokens
+  title: Which Fastly users have an API token?
+  description: Returns a list of Fastly users that have created an API token with the token details.
+  queries:
+  - query: |
+      FIND fastly_user AS u
+      THAT HAS fastly_api_token AS t
+      RETURN
+        u.displayName AS FastlyUser,
+        t.displayName,
+        t.scopes,
+        t.createdOn,
+        t.expiresOn,
+        t.lastUsedOn,
+        t.lastUsedAt
+  tags:
+  - fastly
+  - network

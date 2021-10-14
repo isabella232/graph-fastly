@@ -38,6 +38,14 @@ export async function fetchServices({
           category: ['infrastructure'],
           description: data.comment,
           version: data.version,
+          /**
+           * Fastly "Service" description: https://developer.fastly.com/reference/api/services/service/
+           *
+           * A Service represents the configuration for a website, app, API, or
+           * anything else to be served through Fastly. A Service can have many
+           * Versions, through which Backends, Domains, and more can be configured.
+           */
+          function: [],
           createdOn: getTime(data.created_at),
           updatedOn: getTime(data.updated_at),
         },
