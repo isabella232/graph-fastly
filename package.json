@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "files": [
-    "src"
+    "src",
+    "jupiterone"
   ],
   "publishConfig": {
     "access": "public"
